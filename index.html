@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>英検1分クイズ</title>
+
+<style>
+  body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #f2f2f7; /* iOS風 */
+  margin: 0;
+  padding: 0;
+}
+
+
+  h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+
+  .card {
+  background: #fff;
+  margin: 18px;
+  padding: 24px;
+  border-radius: 20px;
+  box-shadow: 0 12px 32px rgba(0,0,0,0.08);
+}
+
+
+
+  .jp {
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 15px;
+  }
+
+  button {
+    background: #007aff;
+
+  width: 100%;
+  padding: 18px;
+  margin-top: 12px;
+  font-size: 17px;
+  border-radius: 14px;
+  border: none;
+  font-weight: 400;
+}
+
+button:active {
+  transform: scale(0.97);
+  opacity: 0.9;
+}
+
+
+
+  .level-btn {
+    background: #007aff;
+    color: #fff;
+  }
+
+  .choice {
+  background: #f2f2f7;
+  border-radius: 14px;
+  transition: 0.2s;
+}
+
+.choice:hover {
+  background: #e5e5ea;
+}
+
+
+.correct {
+  background: linear-gradient(135deg, #34c759, #2ecc71) !important;
+  color: white;
+}
+
+.wrong {
+  background: linear-gradient(135deg, #ff3b30, #ff453a) !important;
+  color: white;
+}
+
+
+
+  .next-btn {
+    background: #007aff;
+    color: #fff;
+    display: none;
+  }
+
+  .app-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(255,255,255,0.9);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 14px 16px;
+  font-size: 18px;
+  font-weight: 700;
+  border-bottom: 1px solid #e5e5ea;
+}
+
+
+.quiz-header {
+  display: grid;
+  grid-template-columns: 44px 1fr 44px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.icon-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: #007aff;
+  color: white;
+  font-size: 18px;
+  border: none;
+}
+
+
+.progress {
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: #444;
+}
+
+.close-btn {
+  font-size: 22px;
+}
+#question {
+  font-size: 22px;
+  font-weight: 700;
+  margin: 16px 0 8px;
+}
+
+.choice {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 18px;
+  margin-bottom: 12px;
+  font-size: 17px;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.choice:active {
+  transform: scale(0.97);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+}
+
+
+
+  /* スマホ用 */
+@media (max-width: 480px) {
+  h1 {
+    font-size: 22px;
+  }
+
+  #question {
+    font-size: 20px;
+  }
+
+  .choice {
+    font-size: 18px;
+    padding: 18px;
+  }
+}
+</style>
+
+
+<header class="app-header">
+  📘 英検クイズ
+</header>
+<div class="card" id="resultCard" style="display:none;">
+  <h2>結果</h2>
+  <p id="scoreText"></p>
+
+  <button onclick="retrySameLevel()">もう一度このレベル</button>
+  <button onclick="restartQuiz()">レベル選択へ</button>
+</div>
+
+</head>
+
+<body>
+
+<div class="card" id="level">
+  <p>レベルを選んでください</p>
+  <button class="level-btn" onclick="startQuiz('5')">英検5級</button>
+<button class="level-btn" onclick="startQuiz('4')">英検4級</button>
+<button class="level-btn" onclick="startQuiz('3')">英検3級</button>
+<button class="level-btn" onclick="startQuiz('準2')">英検準2級</button>
+<button class="level-btn" onclick="startQuiz('2')">英検2級</button>
+<button class="level-btn" onclick="startQuiz('1')">英検1級</button>
+</div>
+
+<div class="card" id="quiz" style="display:none;">
+
+  <!-- ヘッダー -->
+  <div class="quiz-header">
+    <button
+      id="prevBtn"
+      class="icon-btn"
+      onclick="prevQuestion()"
+      style="visibility:hidden;"
+    >
+      ←
+    </button>
+  
+    <div class="progress">
+      <span id="progressText">1 / 10</span>
+    </div>
+  
+    <button
+      class="icon-btn close-btn"
+      onclick="backToLevel()"
+    >
+      ✕
+    </button>
+  </div>
+  
+
+  <!-- 問題 -->
+  <h2 id="question"></h2>
+  <p class="jp" id="jp"></p>
+
+  <!-- 選択肢 -->
+  <div id="choices"></div>
+
+  <!-- 結果 -->
+  <div id="result"></div>
+
+  <!-- 次へ -->
+  <button class="next-btn" id="nextBtn" onclick="nextQuestion()">
+    次の問題へ
+  </button>
+
+</div>
+
+
+
+
+<script src="quizzes.js"></script>
+<script>
+let previousScreen = "level";
+let currentLevel;
+let currentIndex = 0;
+let correctCount = 0;
+
+function startQuiz(level) {
+  previousScreen = "level"; // ← 追加
+
+  currentLevel = level;
+  currentIndex = 0;
+  correctCount = 0;
+
+  shuffle(quizzes[currentLevel]);
+
+  document.getElementById("level").style.display = "none";
+  document.getElementById("quiz").style.display = "block";
+  showQuestion();
+}
+
+
+function showQuestion() {
+  document.getElementById("result").innerHTML = "";
+  document.getElementById("nextBtn").style.display = "none";
+  document.getElementById("prevBtn").style.visibility =
+  currentIndex > 0 ? "visible" : "hidden";
+
+
+  // 前の問題ボタンの表示制御
+
+
+  const quiz = quizzes[currentLevel][currentIndex];
+  shuffleChoices(quiz);
+  
+  // 問題番号を表示
+  // ヘッダーの進捗表示
+document.getElementById("progressText").innerText =
+  `問題 ${currentIndex + 1} / ${quizzes[currentLevel].length}`;
+
+// 問題文
+document.getElementById("question").innerText = quiz.question;
+
+  
+  document.getElementById("jp").innerText = quiz.jp;
+
+  const choicesDiv = document.getElementById("choices");
+  choicesDiv.innerHTML = "";
+
+  quiz.choices.forEach((choice, index) => {
+    const btn = document.createElement("button");
+    btn.innerText = choice;
+    btn.className = "choice";
+    btn.onclick = () => checkAnswer(btn, index);
+    choicesDiv.appendChild(btn);
+  });
+}
+
+
+
+function checkAnswer(button, selected) {
+  const quiz = quizzes[currentLevel][currentIndex];
+  const buttons = document.querySelectorAll(".choice");
+  buttons.forEach(b => b.disabled = true);
+
+  let resultHtml = "";
+
+  if (selected === quiz.answer) {
+    button.classList.add("correct");
+    correctCount++;
+    resultHtml += `<p style="color:#34c759;font-weight:bold;">正解！</p>`;
+  } else {
+    button.classList.add("wrong");
+    buttons[quiz.answer].classList.add("correct");
+    resultHtml += `<p style="color:#ff3b30;font-weight:bold;">不正解</p>`;
+  }
+
+  // ★ 解説を表示
+  resultHtml += `
+    <p style="margin-top:10px;">
+      <strong>解説：</strong><br>
+      ${quiz.explanation}
+    </p>
+  `;
+
+  document.getElementById("result").innerHTML = resultHtml;
+  document.getElementById("nextBtn").style.display = "block";
+}
+
+
+function nextQuestion() {
+  currentIndex++;
+  if (currentIndex < quizzes[currentLevel].length) {
+    showQuestion();
+  } else {
+  previousScreen = "quiz"; // ← 追加
+
+  document.getElementById("quiz").style.display = "none";
+  document.getElementById("resultCard").style.display = "block";
+  document.getElementById("scoreText").innerText =
+    quizzes[currentLevel].length + "問中 " +
+    correctCount + "問正解！";
+}
+
+}
+function shuffle(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+}
+
+function shuffleChoices(quiz) {
+  // 正解の選択肢を保存
+  const correctChoice = quiz.choices[quiz.answer];
+
+  // choices をシャッフル
+  for (let i = quiz.choices.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [quiz.choices[i], quiz.choices[j]] = [quiz.choices[j], quiz.choices[i]];
+  }
+
+  // 正解がどこに行ったか探して answer を更新
+  quiz.answer = quiz.choices.indexOf(correctChoice);
+}
+
+function showResult() {
+  // クイズ画面を隠す
+  document.getElementById("quiz").style.display = "none";
+
+  const total = quizzes[currentLevel].length;
+  const percent = Math.round((correctCount / total) * 100);
+
+  document.getElementById("scoreText").innerHTML = `
+    <strong>${total}問中 ${correctCount}問正解</strong><br>
+    正解率：${percent}%
+  `;
+
+  // 結果カードを表示
+  document.getElementById("resultCard").style.display = "block";
+}
+
+function restartQuiz() {
+  // 結果カードを隠す
+  document.getElementById("resultCard").style.display = "none";
+
+  // クイズ画面を隠す
+  document.getElementById("quiz").style.display = "none";
+
+  // レベル選択画面を表示
+  document.getElementById("level").style.display = "block";
+}
+
+function retrySameLevel() {
+  // 結果カードを隠す
+  document.getElementById("resultCard").style.display = "none";
+
+  // カウントをリセット
+  currentIndex = 0;
+  correctCount = 0;
+
+  // 問題をシャッフルし直す
+  shuffle(quizzes[currentLevel]);
+
+  // クイズ画面を表示
+  document.getElementById("quiz").style.display = "block";
+
+  // 最初の問題を表示
+  showQuestion();
+}
+function backToLevel() {
+  currentIndex = 0;
+  correctCount = 0;
+
+  document.getElementById("quiz").style.display = "none";
+  document.getElementById("resultCard").style.display = "none";
+  document.getElementById("level").style.display = "block";
+}
+
+function prevQuestion() {
+  if (currentIndex > 0) {
+    currentIndex--;
+    showQuestion();
+  }
+}
+
+
+
+
+</script>
+
+</body>
+</html>
