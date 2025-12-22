@@ -245,6 +245,32 @@ button:active {
   padding-left: 24px;
   padding-right: 24px;
 }
+/* ===== 次の問題へ：下固定ボタン ===== */
+.next-btn {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 16px;
+  margin: 0 16px;
+  width: calc(100% - 32px);
+  z-index: 1000;
+
+  border-radius: 16px;
+  font-size: 18px;
+  padding: 18px;
+}
+
+/* iPhoneの下スワイプバー対策 */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .next-btn {
+    bottom: calc(16px + env(safe-area-inset-bottom));
+  }
+}
+
+/* 下にボタンがある分、コンテンツに余白 */
+#quiz {
+  padding-bottom: 120px;
+}
 
 
 </style>
