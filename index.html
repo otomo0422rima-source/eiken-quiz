@@ -404,6 +404,8 @@ document.getElementById("question").innerText = quiz.question;
     btn.onclick = () => checkAnswer(btn, index);
     choicesDiv.appendChild(btn);
   });
+  saveProgress();
+
 }
 
 
@@ -435,6 +437,8 @@ function checkAnswer(button, selected) {
 
   document.getElementById("result").innerHTML = resultHtml;
   document.getElementById("nextBtn").style.display = "block";
+  saveProgress();
+
 }
 
 
@@ -565,6 +569,35 @@ quizArea.addEventListener("touchend", (e) => {
     nextQuestion();
   }
 });
+
+function saveProgress() {
+  const data = {
+    level: currentLevel,
+    index: currentIndex,
+    correct: correctCount
+  };
+  localStorage.setItem("quizProgress", JSON.stringify(data));
+}
+
+function loadProgress() {
+  const saved = localStorage.getItem("quizProgress");
+  if (!saved) return false;
+
+  const data = JSON.parse(saved);
+  currentLevel = data.level;
+  currentIndex = data.index;
+  correctCount = data.correct;
+
+  document.getElementById("level").style.display = "none";
+  document.getElementById("quiz").style.display = "block";
+  showQuestion();
+
+  return true;
+}
+window.addEventListener("load", () => {
+  loadProgress();
+});
+
 
 
 
