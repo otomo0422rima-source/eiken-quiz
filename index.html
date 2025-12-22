@@ -395,6 +395,8 @@ button:active {
 
 <script src="quizzes.js"></script>
 <script>
+  let isAnswering = false; // 解説表示中かどうか
+
 let previousScreen = "level";
 let currentLevel;
 let currentIndex = 0;
@@ -416,6 +418,7 @@ function startQuiz(level) {
 
 
 function showQuestion() {
+  isAnswering = false; // ← 解説がない状態
   document.getElementById("result").innerHTML = "";
   document.getElementById("nextBtn").style.display = "none";
   document.getElementById("prevBtn").style.visibility =
@@ -485,7 +488,8 @@ function checkAnswer(button, selected) {
 
   document.getElementById("result").innerHTML = resultHtml;
   document.getElementById("nextBtn").style.display = "block";
-  saveProgress();
+isAnswering = true; // ← 追加
+saveProgress();
 
 }
 
@@ -599,24 +603,31 @@ quizArea.addEventListener("touchstart", (e) => {
 });
 
 quizArea.addEventListener("touchend", (e) => {
+  if (isAnswering) return; // ★ 解説表示中はスワイプ無効
+
   touchEndX = e.changedTouches[0].screenX;
   const diffX = touchEndX - touchStartX;
 
-  // 画面端スワイプは無視（Safari優先）
+  // Safariの戻るジェスチャーを邪魔しない
   if (touchStartX < 30 || touchStartX > window.innerWidth - 30) return;
 
+  // スワイプ距離が短すぎたら無視
   if (Math.abs(diffX) < 60) return;
 
-  // 👉 前へ
+  // 👉 右スワイプ：前の問題
   if (diffX > 0 && currentIndex > 0) {
     prevQuestion();
   }
 
-  // 👈 次へ（解答後のみ）
-  if (diffX < 0 && document.getElementById("nextBtn").style.display === "block") {
+  // 👈 左スワイプ：次の問題（解答後のみ）
+  if (
+    diffX < 0 &&
+    document.getElementById("nextBtn").style.display === "block"
+  ) {
     nextQuestion();
   }
 });
+
 
 function saveProgress() {
   const data = {
