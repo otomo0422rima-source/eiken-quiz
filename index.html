@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>英検1分クイズ</title>
+<title>英語クイズ</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
   body {
@@ -196,6 +196,13 @@ button:active {
 #quiz {
   padding-top: calc(24px + env(safe-area-inset-top));
 }
+.level-text {
+  font-size: 12px;
+  font-weight: 600;
+  color: #007aff;
+  margin-bottom: 2px;
+}
+
 
 
 
@@ -245,7 +252,7 @@ button:active {
 
 <body>
   <header class="app-header">
-    📘 英検クイズ
+    📘 英語クイズ
   </header>
   <div class="card" id="resultCard" style="display:none;">
     <h2>結果</h2>
@@ -278,8 +285,10 @@ button:active {
     </button>
   
     <div class="progress">
+      <div id="levelText" class="level-text">英検3級</div>
       <span id="progressText">1 / 10</span>
     </div>
+    
   
     <button
       class="icon-btn close-btn"
@@ -337,6 +346,9 @@ function showQuestion() {
   document.getElementById("nextBtn").style.display = "none";
   document.getElementById("prevBtn").style.visibility =
   currentIndex > 0 ? "visible" : "hidden";
+  document.getElementById("levelText").innerText =
+  `英検${currentLevel}級`;
+
 
 
   // 前の問題ボタンの表示制御
