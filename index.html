@@ -233,6 +233,54 @@ button:active {
   margin-top: 24px;
 }
 
+/* ===== 再開モーダル ===== */
+.resume-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.resume-card {
+  background: #fff;
+  width: calc(100% - 48px);
+  max-width: 360px;
+  padding: 24px;
+  border-radius: 20px;
+  text-align: center;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+}
+
+.resume-card h3 {
+  margin: 0 0 8px;
+  font-size: 18px;
+}
+
+.resume-card p {
+  margin: 0 0 20px;
+  font-size: 14px;
+  color: #666;
+}
+
+.resume-btn {
+  width: 100%;
+  padding: 16px;
+  border-radius: 14px;
+  font-size: 16px;
+  border: none;
+  margin-top: 10px;
+  background: #f2f2f7;
+}
+
+.resume-btn.primary {
+  background: #007aff;
+  color: #fff;
+}
+
+
 @media (max-width: 480px) {
   .card {
     margin-top: 48px;
@@ -594,15 +642,40 @@ function loadProgress() {
 
   return true;
 }
+
+
 window.addEventListener("load", () => {
-  loadProgress();
+  const saved = localStorage.getItem("quizProgress");
+  if (saved) {
+    document.getElementById("resumeModal").style.display = "flex";
+  }
 });
+
+function resumeQuiz() {
+  document.getElementById("resumeModal").style.display = "none";
+  loadProgress();
+}
+
+function restartFromStart() {
+  localStorage.removeItem("quizProgress");
+  document.getElementById("resumeModal").style.display = "none";
+}
+
 
 
 
 
 
 </script>
+<!-- 再開確認モーダル -->
+<div id="resumeModal" class="resume-modal" style="display:none;">
+  <div class="resume-card">
+    <h3>クイズを再開しますか？</h3>
+    <p>前回の途中から続けられます</p>
+    <button class="resume-btn primary" onclick="resumeQuiz()">続きから</button>
+    <button class="resume-btn" onclick="restartFromStart()">最初から</button>
+  </div>
+</div>
 
 </body>
 </html>
